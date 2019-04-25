@@ -21,7 +21,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import HelloWorld from '@/components/HelloWorld.vue'; // @ is an alias to /src
-import { remote } from 'electron';
+import { remote , app } from 'electron';
 
 @Component({
   components: {
@@ -29,9 +29,9 @@ import { remote } from 'electron';
   }
 })
 export default class Home extends Vue {
-  public videoId: string = ''; // Example: tlThdr3O5Qo
-  public randomMax: number = 1;
-  public luckyNumber: number = 1;
+  public videoId: string = 'zI9ysnXh_Ps'; // Example: tlThdr3O5Qo
+  public randomMax: number = 50;
+  public luckyNumber: number = 25;
   public playerVars: any = { autoplay: 1 }
   public randomLoop: any;
   public isFullScreen: boolean = false;
@@ -41,8 +41,10 @@ export default class Home extends Vue {
     return obj.player;
   }
 
-  public toggleFullScreen(isFullScreen){
-    const bounds = remote.getCurrentWindow().webContents.getOwnerBrowserWindow().getBounds();
+  public toggleFullScreen(isFullScreen: any){
+    let bounds:any = remote.getCurrentWindow();
+    bounds = bounds.webContents.getOwnerBrowserWindow().getBounds();
+
     this.isFullScreen = isFullScreen;
     if(isFullScreen){
       this.player.setSize(bounds.width, bounds.height);
@@ -52,12 +54,10 @@ export default class Home extends Vue {
   }
 
   startRandomJumpscare(){
-    if(this.randomLoop) this.stopRandomJumpscare();
     this.goInvisible();
-    this.rollDice();
-    this.randomLoop = setInterval(()=>{
-      this.rollDice();
-    }, 60000 * 5) // Every 5 minutes
+    setTimeout(()=>{
+      this.triggerJumpScare();
+    }, 60000 * 60)
   }
 
   rollDice(){
@@ -79,6 +79,7 @@ export default class Home extends Vue {
   }
 
   goInvisible(){
+    app.dock.hide();
     remote.getCurrentWindow().hide();
     remote.getCurrentWindow().setSkipTaskbar(true);
   }
